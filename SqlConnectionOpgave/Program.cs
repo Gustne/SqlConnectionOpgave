@@ -25,5 +25,4 @@ Console.WriteLine();
 
 Item item1 = itemBL.Get(10);
 
-Console.WriteLine($"ID: {item1.Id} Name: {item1.Name} saleprice: {item1.Sellprice}");
 
