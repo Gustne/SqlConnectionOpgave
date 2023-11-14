@@ -34,34 +34,64 @@ namespace DataAccess
             using SqlConnection dbConn = new SqlConnection(connString);
             SqlCommand sqlcommand = new SqlCommand(command, dbConn);
             sqlcommand.Parameters.AddWithValue("@ID", id);
+            List<Item> output = LoadData(sqlcommand,dbConn);
 
-            return LoadData(sqlcommand,dbConn)[0];
+            if (output.Count == 0)
+            {
+                return new Item();
+            }
+            else
+            {
+                return output[0];
+            }
+
         }
 
 
         private List<Item> LoadData(SqlCommand sqlCommand, SqlConnection dbConn)
         {
             List<Item> items = new List<Item>();
-
-            dbConn.Open();
-            using SqlDataReader reader = sqlCommand.ExecuteReader();
-            while (reader.Read())
+            try
+            {
+                dbConn.Open();
+            }
+            catch (Exception ex)
             {
 
-                Item item = new Item();
-                item.Id = (int)reader["Id"];
-                item.Name = (string)reader["Itemname"];
-                item.Description = (string)reader["Itemdescription"];
-                item.Stock = (int)reader["Stock"];
-                item.PurchasePrice = (double)reader["Purchaseprice"];
-                item.Profit = (double)reader["Profit"];
-                item.Sellprice = (double)reader["Salesprice"];
-
-                items.Add(item);
-
+                Console.WriteLine($"Fejl i oprettelse af forbindelse til serveren:");
+                if (dbConn.State == System.Data.ConnectionState.Open)
+                {
+                    dbConn.Close();
+                }
+                return items;
             }
-            dbConn.Close();
+            try
+            {
+                using SqlDataReader reader = sqlCommand.ExecuteReader();
+                while (reader.Read())
+                {
 
+                    Item item = new Item();
+                    item.Id = (int)reader["Id"];
+                    item.Name = (string)reader["Itemname"];
+                    item.Description = (string)reader["Itemdescription"];
+                    item.Stock = (int)reader["Stock"];
+                    item.PurchasePrice = (double)reader["Purchaseprice"];
+                    item.Profit = (double)reader["Profit"];
+                    item.Sellprice = (double)reader["Salesprice"];
+
+                    items.Add(item);
+
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fejl under læsning af data, kontroller den din query");
+            }
+            finally 
+            {
+                dbConn.Close();
+            }
             return items;
 
         }
