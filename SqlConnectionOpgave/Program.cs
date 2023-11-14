@@ -25,4 +25,5 @@ Console.WriteLine();
 
 Item item1 = itemBL.Get(10);
 
+Console.WriteLine($"ID: {item1.Id} Name: {item1.Name} saleprice: {Math.Round(item1.Sellprice,2)}");
 
