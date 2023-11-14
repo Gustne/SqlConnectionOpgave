@@ -21,14 +21,33 @@ namespace DataAccess
 
         public List<Item> Get()
         {
-            List<Item> items = new List<Item>();
             string command = "Select *, Purchaseprice * (1+(Profit/100)) AS Salesprice from Items";
             using SqlConnection dbConn = new SqlConnection(connString);
             SqlCommand sqlcommand = new SqlCommand(command, dbConn);
+            
+            return LoadData(sqlcommand,dbConn);
+        }
+
+        public Item Get(int id)
+        {
+            string command = "Select *, Purchaseprice * (1+(Profit/100)) AS Salesprice from Items where Id = @ID";
+            using SqlConnection dbConn = new SqlConnection(connString);
+            SqlCommand sqlcommand = new SqlCommand(command, dbConn);
+            sqlcommand.Parameters.AddWithValue("@ID", id);
+
+            return LoadData(sqlcommand,dbConn)[0];
+        }
+
+
+        private List<Item> LoadData(SqlCommand sqlCommand, SqlConnection dbConn)
+        {
+            List<Item> items = new List<Item>();
+
             dbConn.Open();
-            using SqlDataReader reader = sqlcommand.ExecuteReader();
+            using SqlDataReader reader = sqlCommand.ExecuteReader();
             while (reader.Read())
             {
+
                 Item item = new Item();
                 item.Id = (int)reader["Id"];
                 item.Name = (string)reader["Itemname"];
@@ -44,34 +63,8 @@ namespace DataAccess
             dbConn.Close();
 
             return items;
+
         }
-
-        public Item Get(int id)
-        {
-            Item item = new Item();
-            string command = "Select *, Purchaseprice * (1+(Profit/100)) AS Salesprice from Items where Id = @ID";
-            using SqlConnection dbConn = new SqlConnection(connString);
-            SqlCommand sqlcommand = new SqlCommand(command, dbConn);
-            sqlcommand.Parameters.AddWithValue("@ID", id);
-            dbConn.Open();
-            using SqlDataReader reader = sqlcommand.ExecuteReader();
-            while (reader.Read())
-            {
-
-                item.Id = (int)reader["Id"];
-                item.Name = (string)reader["Itemname"];
-                item.Description = (string)reader["Itemdescription"];
-                item.Stock = (int)reader["Stock"];
-                item.PurchasePrice = (double)reader["Purchaseprice"];
-                item.Profit = (double)reader["Profit"];
-                item.Sellprice = (double)reader["Salesprice"];
-
-            }
-            dbConn.Close();
-
-            return item;
-        }
-
 
     }
 }
