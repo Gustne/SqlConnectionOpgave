@@ -26,6 +26,21 @@ namespace BuisnessLogic
             return db.Get(id);
         }
 
+        public bool Create(Item item)
+        {
+            return db.Create(item);
+        }
+
+        public bool Update(Item item)
+        {
+            return db.Update(item);
+        }
+
+        public bool Delete(int id)
+        {
+            return db.Delete(id);
+        }
+
 
     }
 }
