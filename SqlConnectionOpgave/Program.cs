@@ -15,7 +15,7 @@ items = itemBL.Get();
 foreach (Item item in items)
 {
 
-    Console.WriteLine($"ID:{item.Id} Name:{item.Name} saleprice:{item.Sellprice}");
+    Console.WriteLine($"ID:{item.Id} Name:{item.Name} saleprice:{Math.Round(item.Sellprice,2)}");
 
 
 }

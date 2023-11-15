@@ -12,6 +12,7 @@ namespace DataAccess
 
         string connString;
 
+        //constructor der henter forbindelsesstreng fra app.config fil
         public ItemDA() 
         {
             connString = ConfigurationManager.ConnectionStrings["MySqlServer"].ConnectionString;
@@ -21,7 +22,8 @@ namespace DataAccess
 
         public List<Item> Get()
         {
-            string command = "Select *, Purchaseprice * (1+(Profit/100)) AS Salesprice from Items";
+
+            string command = "SELECT * FROM items";
             using SqlConnection dbConn = new SqlConnection(connString);
             SqlCommand sqlcommand = new SqlCommand(command, dbConn);
             
@@ -30,7 +32,7 @@ namespace DataAccess
 
         public Item Get(int id)
         {
-            string command = "Select *, Purchaseprice * (1+(Profit/100)) AS Salesprice from Items where Id = @ID";
+            string command = "Select * FROM items where Id = @ID";
             using SqlConnection dbConn = new SqlConnection(connString);
             SqlCommand sqlcommand = new SqlCommand(command, dbConn);
             sqlcommand.Parameters.AddWithValue("@ID", id);
@@ -78,7 +80,6 @@ namespace DataAccess
                     item.Stock = (int)reader["Stock"];
                     item.PurchasePrice = (double)reader["Purchaseprice"];
                     item.Profit = (double)reader["Profit"];
-                    item.Sellprice = (double)reader["Salesprice"];
 
                     items.Add(item);
 

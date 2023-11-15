@@ -8,7 +8,14 @@
         public int Stock {  get; set; }
         public double PurchasePrice { get; set; }
         public double Profit {  get; set; }
-        public double Sellprice { get; set; }
+        public double Sellprice 
+        {
+            get
+            {
+                return PurchasePrice * (1 + Profit / 100);
+            }
+                 
+        }
 
     }
 }
