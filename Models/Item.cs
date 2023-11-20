@@ -12,7 +12,7 @@
         {
             get
             {
-                return PurchasePrice * (1 + Profit / 100);
+                return Math.Round(PurchasePrice * (1 + Profit / 100),2);
             }
                  
         }
