@@ -33,6 +33,7 @@ namespace ItemUI.Views
             btnCreateItem.Enabled = false;
             //her sætter jeg alle labels til rød så man kan se om man har tastet korrekt
             SetLabelColor();
+            this.Text = "Add new Liqour";
             // starter events for samtlige tekstfelter hvis de ændre sig
             txtName.TextChanged += TxtNameChanged;
             txtDescription.TextChanged += TxtDescriptionChanged;

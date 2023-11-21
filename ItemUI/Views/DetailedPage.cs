@@ -21,12 +21,12 @@ namespace ItemUI.Views
         public DetailedPage(Form f1, int id)
         {
             InitializeComponent();
-            dgvSettings(id);
+            this.Text = dgvSettings(id);
             this.main = f1;
             this.id = id;
         }
 
-        public void dgvSettings(int id)
+        public string dgvSettings(int id)
         {
             //henter data fra min database på den id som er blevet markeret i main dgv
             Item item = db.Get(id);
@@ -44,6 +44,8 @@ namespace ItemUI.Views
             }
 
             dgvDetail.AutoSize = true;
+
+            return item.Name;
 
         }
 

@@ -34,7 +34,9 @@ namespace ItemUI.Views
             this.id = id;
             this.item = db.Get(id);
             InitializeComponent();
+            this.Text = $"Updating: {this.item.Name}";
             Setup(item);
+            
             //Disse funktioner er identiske med dem i Create da de gør det samme
             txtName.TextChanged += TxtNameChanged;
             txtDescription.TextChanged += TxtDescriptionChanged;
