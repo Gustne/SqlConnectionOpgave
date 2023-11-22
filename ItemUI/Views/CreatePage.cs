@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.ListView;
 
 namespace ItemUI.Views
 {
@@ -17,24 +18,56 @@ namespace ItemUI.Views
 
         // opretter instans af mit BL, starter en form og laver bools for alle værdier er falske fordi felterne er tomme
         ItemBL db = new ItemBL();
-        Form main;
+        Form formerPage;
+        int id;
+        Models.Item item;
         bool nameIsValid = false;
         bool DescriptionIsValid = false;
         bool stockIsValid = false;
         bool purchasePriceIsValid = false;
         bool profitIsValid = false;
+        bool isCreatePage = true;
 
+        //Constructor for min Create
         public CreatePage(Form f1)
         {   
             
-            this.main = f1;
+            this.formerPage = f1;
             InitializeComponent();
             //Her disabler jeg createKnappen
             btnCreateItem.Enabled = false;
             //her sætter jeg alle labels til rød så man kan se om man har tastet korrekt
-            SetLabelColor();
+            SetupCreate();
             this.Text = "Add new Liqour";
             // starter events for samtlige tekstfelter hvis de ændre sig
+            SetupTxtChange();
+        }
+
+        //Constructor for update
+        public CreatePage(Form f1, int id)
+        {
+            // Her henter vi og sætter op med de allerede eksiterende værdier i databasen og derfor er alting true og klar til at opdatere fordi det er lovlige værdier
+            isCreatePage = false;
+            this.formerPage = f1;
+            this.id = id;
+            this.item = db.Get(id);
+            InitializeComponent();
+
+            //opdatere tekst så den passer til update istedet for create
+            this.Text = $"Updating: {this.item.Name}";
+            btnCreateItem.Text = "Update";
+            btnNavToMain.Text = "Go back to detailed view";
+           
+
+            //Disse funktioner er identiske med dem i Create da de gør det samme
+            SetupTxtChange();
+            //klader først setup efter jeg har startet changeevents så den opdatere
+            SetupUpdate(item);
+        }
+
+        // metode der starter alle tekstbox change events
+        private void SetupTxtChange()
+        {
             txtName.TextChanged += TxtNameChanged;
             txtDescription.TextChanged += TxtDescriptionChanged;
             txtStock.TextChanged += TxtStockChanged;
@@ -42,7 +75,8 @@ namespace ItemUI.Views
             txtProfit.TextChanged += TxtProfitChanged;
         }
 
-        private void SetLabelColor()
+        // setup specifict til Create. Her skal vi sætte farver fordi vi ikke ændre tekstboksene
+        private void SetupCreate()
         {
             lblName.ForeColor = Color.Red;
             lblDescription.ForeColor = Color.Red;
@@ -51,6 +85,20 @@ namespace ItemUI.Views
             lblProfit.ForeColor = Color.Red;
 
         }
+        // for vores update sætter vi værdierne ind og det trigger ændringer i tekstbokse så vi behøver ikke sætte farve og Bools
+        private void SetupUpdate(Models.Item item)
+        {
+            txtName.Text = item.Name;
+            txtDescription.Text = item.Description;
+            txtStock.Text = item.Stock.ToString();
+            txtPurchasePrice.Text = item.PurchasePrice.ToString();
+            txtProfit.Text = item.Profit.ToString();
+
+        }
+
+
+
+
         // jeg gennemgår en af metoderne fordi de minder enormt om hinanden
         private void TxtNameChanged(object? sender, EventArgs e)
         {
@@ -175,52 +223,72 @@ namespace ItemUI.Views
         {
             this.Close();
 
-            main.Show();
+            formerPage.Show();
         }
 
         // her er override af closing så den opfører sig som hvis du klikkede på back to main knappen eller lukker formen ned ved alt+f4
         protected override void OnClosing(CancelEventArgs e)
         {
-            main.Show();
+            formerPage.Show();
             base.OnClosing(e);
         }
 
         // hvis vi klikker på create knappen så ved vi at alle inputs er valide og har tjekket om de kan parses til respektive værdier
         private void btnCreateItem_Click(object sender, EventArgs e)
         {
-            //laver et item hvor jeg læser de respektive felter ind i mit Item. Jeg bruger bare parse funktioner fordi valideringen sikre at de kan parses
-            Item item = new Item();
-            item.Name = txtName.Text;
-            item.Description = txtDescription.Text;
-            item.Stock = int.Parse(txtStock.Text);
-            item.PurchasePrice = double.Parse(txtPurchasePrice.Text);
-            item.Profit = double.Parse(txtProfit.Text);
-            
-            //her kalder jeg min BL som returnere en bool hvis Create(item) lykkedes
-            if (db.Create(item))
+            if (isCreatePage)
             {
-                //Dette kaster en messageBox der fortæller det lykkedes at tilføje et item og så spørger den om du vil tilføje flere
-                DialogResult result = MessageBox.Show("It was a succes do you want to add more items", "More?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
 
+                //laver et item hvor jeg læser de respektive felter ind i mit Item. Jeg bruger bare parse funktioner fordi valideringen sikre at de kan parses
+                Models.Item item = new Models.Item();
+                item.Name = txtName.Text;
+                item.Description = txtDescription.Text;
+                item.Stock = int.Parse(txtStock.Text);
+                item.PurchasePrice = double.Parse(txtPurchasePrice.Text);
+                item.Profit = double.Parse(txtProfit.Text);
 
-                //hvis man vil tilføje flere så sætter den alle tekstbokse tomme og går tilbage til formen
-                if (result == DialogResult.Yes)
+                //her kalder jeg min BL som returnere en bool hvis Create(item) lykkedes
+                if (db.Create(item))
                 {
-                    txtName.Text = string.Empty;
-                    txtDescription.Text = string.Empty;
-                    txtStock.Text = string.Empty;
-                    txtPurchasePrice.Text = string.Empty;
-                    txtProfit.Text = string.Empty;
+                    //Dette kaster en messageBox der fortæller det lykkedes at tilføje et item og så spørger den om du vil tilføje flere
+                    DialogResult result = MessageBox.Show("It was a succes do you want to add more items", "More?", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+
+
+                    //hvis man vil tilføje flere så sætter den alle tekstbokse tomme og går tilbage til formen
+                    if (result == DialogResult.Yes)
+                    {
+                        txtName.Text = string.Empty;
+                        txtDescription.Text = string.Empty;
+                        txtStock.Text = string.Empty;
+                        txtPurchasePrice.Text = string.Empty;
+                        txtProfit.Text = string.Empty;
+
+                    }
+                    else
+                    {
+                        //ellers lukker vi den og viser main igen
+                        this.Close();
+                        formerPage.Show();
+                    }
+
 
                 }
-                else
+            }
+            else
+            {
+                this.item.Name = txtName.Text;
+                this.item.Description = txtDescription.Text;
+                this.item.Stock = int.Parse(txtStock.Text);
+                this.item.PurchasePrice = double.Parse(txtPurchasePrice.Text);
+                this.item.Profit = double.Parse(txtProfit.Text);
+
+                // ved succefull opdatering lukker vi opdate ned
+                if (db.Update(this.item))
                 {
-                    //ellers lukker vi den og viser main igen
+                    MessageBox.Show("Updated succesfully");
                     this.Close();
-                    main.Show();
+                    formerPage.Show();
                 }
-
-
             }
         }
     }

@@ -95,7 +95,7 @@ namespace ItemUI.Views
         //igen her kalder vi bare hvis vi klikker på opdatere knappen
         private void btnUpdateClick(object sender, EventArgs e)
         {
-            UpdatePage updatePage = new UpdatePage(this, this.id);
+            CreatePage updatePage = new CreatePage(this, this.id);
 
             this.Hide();
 
